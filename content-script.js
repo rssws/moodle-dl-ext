@@ -13,7 +13,7 @@ async function getFiles() {
     if (filteredUrl) {
       const response = await fetch(filteredUrl);
       console.log(response);
-      contentList.push({ url: response.url, content: await response.text() });
+      contentList.push({ url: response.url, content: await response.arrayBuffer() });
     }
   }
 
