@@ -5,33 +5,41 @@ function filterUrl(url) {
 }
 
 async function getFiles() {
+  console.log('Processing URLs...');
   const urls = document.getElementsByTagName('a');
 
   const contentList = [];
+  const promiseList = [];
   for (const url of urls) {
     const filteredUrl = filterUrl(url);
     if (filteredUrl) {
-      const response = await fetch(filteredUrl);
-      console.log(response);
-      contentList.push({ url: response.url, content: await response.arrayBuffer() });
+      const promise = fetch(filteredUrl)
+        .then((response) => {
+          console.log(`(${contentList.length + 1} / ${promiseList.length}) [${response.statusText}] ${response.url}`);
+          contentList.push({ url: response.url, content: response.arrayBuffer() });
+        });
+      promiseList.push(promise);
     }
   }
 
-  console.log("Zipping...");
+  console.log(`Downloading ${promiseList.length} files ...`);
+  await Promise.all(promiseList);
+
+  console.log("Preparing for zipping...");
   const zip = new JSZip();
   for (const element of contentList) {
     const { url, content } = element;
-    console.log("Processing " + url);
+    
     const filename = decodeURIComponent(url.split('#').shift().split('?').shift().split('/').pop());
     zip.file(filename, content); 
   }
   
-  console.log("Generating...")
+  console.log("Generating zip file...")
   zip.generateAsync({
     type:"blob",
     compression: "STORE"
   }).then((blob) => {
-    console.log("Transmitting...");
+    console.log("Saving the file...");
     chrome.runtime.sendMessage(URL.createObjectURL(blob));
   })
 }
