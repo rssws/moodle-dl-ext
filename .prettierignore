@@ -1,0 +1,7 @@
+node_modules/
+dist/
+output/
+.yarn/
+coverage/
+README.md
+.*rc

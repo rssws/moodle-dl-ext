@@ -1,3 +1,3 @@
-import { getFiles } from "./content-script";
+import { getFiles } from './content-script';
 
 getFiles();

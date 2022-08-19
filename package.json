@@ -4,10 +4,7 @@
   "packageManager": "yarn@1.22.18",
   "description": "Moodle downloader extension for Chrome",
   "private": true,
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/rssws/moodle-dl-ext.git"
-  },
+  "repository": "git+https://github.com/rssws/moodle-dl-ext.git",
   "author": "rssws",
   "license": "GPL-3.0",
   "bugs": {
@@ -18,7 +15,8 @@
     "build": "turbo run build",
     "package": "rm -rf ./output && mkdir output && turbo run package --force",
     "test": "turbo run test",
-    "lint": "turbo run lint"
+    "lint": "turbo run lint",
+    "lint:fix": "turbo run lint:fix --force"
   },
   "workspaces": [
     "packages/background",
@@ -26,6 +24,10 @@
     "packages/popup"
   ],
   "devDependencies": {
+    "eslint": "^8.22.0",
+    "eslint-plugin-jsdoc": "^39.3.6",
+    "eslint-plugin-no-null": "^1.0.2",
+    "prettier": "^2.7.1",
     "turbo": "^1.4.3"
   }
 }

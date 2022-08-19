@@ -1,18 +1,12 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
+    "lib": ["dom", "dom.iterable", "esnext"],
     "rootDir": "./src",
     "outDir": "./build",
     "tsBuildInfoFile": "./build/tsconfig.tsbuildinfo",
-    "composite": true,
+    "composite": true
   },
-  "include": [
-    "src/**/*.ts"
-  ],
+  "include": ["src/**/*.ts"],
   "files": []
 }

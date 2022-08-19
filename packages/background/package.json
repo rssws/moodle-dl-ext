@@ -8,7 +8,9 @@
     "package": "mkdir -p ../../output/background && cp -r dist/main.js ../../output/background",
     "build:dev": "webpack --mode=development",
     "build:prod": "webpack --mode=production --node-env=production",
-    "watch": "webpack --watch"
+    "watch": "webpack --watch",
+    "lint": "eslint --ext .ts . && prettier . --config ../../.prettierrc --ignore-path ../../.prettierignore -c",
+    "lint:fix": "set TIMING=1 && eslint --ext .ts . --fix --quiet && prettier . --config ../../.prettierrc -w --loglevel error"
   },
   "author": "rssws",
   "license": "GPL-3.0",
