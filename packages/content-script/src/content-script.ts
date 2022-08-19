@@ -1,28 +1,30 @@
-function filterUrl(url) {
+import JSZip from "jszip";
+
+function filterUrl(url: string) {
   const re = /.*(https:\/\/.*\/resource\/view.php\?id=[0-9]+).*/;
   const result = re.exec(url);
   return result && result[0];
 }
 
-function urlToFilename(url) {
-  return decodeURIComponent(url.split('#').shift().split('?').shift().split('/').pop());
+function urlToFilename(url: string) {
+  return decodeURIComponent(url.split('#').shift()!.split('?').shift()!.split('/').pop()!);
 }
 
-function log(content) {
+function log(content: string) {
   chrome.runtime.sendMessage({
     type: "popup-log",
     data: { content }
   });
 }
 
-async function getFiles() {
+export async function getFiles() {
   log('Processing URLs...');
   const urls = document.getElementsByTagName('a');
 
-  const contentList = [];
-  const promiseList = [];
+  const contentList: any[] = [];
+  const promiseList: Promise<void>[] = [];
   for (const url of urls) {
-    const filteredUrl = filterUrl(url);
+    const filteredUrl = filterUrl(url.toString());
     if (filteredUrl) {
       const promise = fetch(filteredUrl)
         .then((response) => {
@@ -59,5 +61,3 @@ async function getFiles() {
     });
   })
 }
-
-getFiles();

@@ -21,7 +21,7 @@ function App() {
     const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
     chrome.scripting.executeScript({
       target: { tabId: tabs[0].id! },
-      files: ['js/jszip.min.js', 'content-script.js']
+      files: ['content-script/main.js']
     });
   };
 

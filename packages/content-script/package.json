@@ -1,0 +1,27 @@
+{
+  "name": "@moodle-dl-ext/content-script",
+  "version": "0.0.1",
+  "description": "",
+  "scripts": {
+    "pre-build": "rm -rf build dist && mkdir -p build dist",
+    "build": "webpack --mode=production --node-env=production",
+    "package": "mkdir -p ../../output/content-script && cp -r dist/main.js ../../output/content-script",
+    "build:dev": "webpack --mode=development",
+    "build:prod": "webpack --mode=production --node-env=production",
+    "watch": "webpack --watch"
+  },
+  "author": "rssws",
+  "license": "GPL-3.0",
+  "dependencies": {
+    "jszip": "^3.10.1"
+  },
+  "devDependencies": {
+    "@types/chrome": "^0.0.194",
+    "@types/webpack": "^5.28.0",
+    "@webpack-cli/generators": "^2.5.0",
+    "ts-loader": "^9.3.1",
+    "typescript": "^4.7.4",
+    "webpack": "^5.74.0",
+    "webpack-cli": "^4.10.0"
+  }
+}
