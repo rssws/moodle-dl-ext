@@ -1,3 +1,3 @@
-import { getFiles } from './content-script';
+import { main } from './moodle-files';
 
-getFiles();
+main();
