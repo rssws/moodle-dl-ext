@@ -1,14 +1,15 @@
-import JSZip, { filter } from 'jszip';
+import JSZip from 'jszip';
 import { log } from './message';
+import { randStr } from './util';
 
-type ResourceType = 'courseView' | 'courseResources' | 'modFolderView' | 'modResourceView' | 'pluginfile' | 'plainhtml';
+type ResourceType = 'courseView' | 'courseResources' | 'modFolderView' | 'modResourceView' | 'pluginfile';
 interface Resource {
   type: ResourceType;
   url: string;
 }
 
 interface MoodleFile {
-  name: string;
+  path: string;
   content: ArrayBuffer;
 }
 
@@ -22,7 +23,6 @@ filters.set('pluginfile', /(.*\/pluginfile\.php.*)/);
 function convertUrlToResource(url: string): Resource | undefined {
   for (const [resourceType, regExp] of filters.entries()) {
     const result = url.match(regExp)?.[1];
-    console.log(result);
     if (result) {
       return {
         type: resourceType,
@@ -34,21 +34,34 @@ function convertUrlToResource(url: string): Resource | undefined {
 }
 
 function urlToFilename(url: string): string {
-  return decodeURIComponent(url.split('#').shift()!.split('?').shift()!.split('/').pop()!);
+  return getValidFilename(decodeURIComponent(url.split('#').shift()!.split('?').shift()!.split('/').pop()!));
+}
+
+function getValidFilename(name: string): string {
+  name = name
+    .trim()
+    .replaceAll(' ', '_')
+    .replaceAll(/[^-\w.]/gu, '');
+  if (['', '.', '..'].includes(name)) {
+    console.warn(`filename '${name}' is invalid!`);
+    return `invalid-filename_${randStr(8)}`;
+  }
+  return name;
 }
 
 const processedResourceUrls = new Set<string>();
 
-async function getMoodleFiles(resource: Resource): Promise<MoodleFile[]> {
+async function getMoodleFiles(resource: Resource, filenamePrefix = ''): Promise<MoodleFile[]> {
   const { url, type } = resource;
 
   if (processedResourceUrls.has(url)) {
     return [];
   }
   processedResourceUrls.add(url);
-  console.log(processedResourceUrls);
 
-  if (['courseView', 'courseResources', 'modFolderView', 'plainhtml'].includes(type)) {
+  if (['courseView'].includes(type)) {
+    return getMoodleFiles({ type: 'courseResources', url: resource.url.replace('view', 'resources') });
+  } else if (['courseResources', 'modFolderView'].includes(type)) {
     log(`Processing ${url}`);
 
     const response = await fetch(url);
@@ -57,27 +70,45 @@ async function getMoodleFiles(resource: Resource): Promise<MoodleFile[]> {
     const urls = document.getElementsByTagName('a');
     let moodleFiles: MoodleFile[] = [];
 
+    let pagePrefix = filenamePrefix;
+    if (['courseResources'].includes(type)) {
+      const title = document.getElementsByTagName('title')[0].innerText;
+      const processedTitle = title ? getValidFilename(title) : '';
+      pagePrefix += processedTitle + '/';
+    }
+
+    const localProcessedResourceUrls = new Set<string>();
     for (const url of urls) {
-      const resource = convertUrlToResource(url.href);
-      if (resource) {
-        moodleFiles = moodleFiles.concat(await getMoodleFiles(resource));
+      const targetResource = convertUrlToResource(url.href);
+      // The second condition prevents from crawling back to other courses.
+      if (targetResource && targetResource.type !== 'courseView') {
+        if (localProcessedResourceUrls.has(targetResource.url) || processedResourceUrls.has(targetResource.url)) {
+          continue;
+        }
+        localProcessedResourceUrls.add(targetResource.url);
+
+        let finalPrefix = pagePrefix;
+        if (targetResource.type === 'modFolderView') {
+          finalPrefix += urlToFilename(url.innerText) + '/';
+        }
+        moodleFiles = moodleFiles.concat(await getMoodleFiles(targetResource, finalPrefix));
       }
     }
     return moodleFiles;
   } else if (['modResourceView', 'pluginfile'].includes(type)) {
     log(`Downloading ${url}`);
     const response = await fetch(url);
-    return [{ name: urlToFilename(response.url), content: await response.arrayBuffer() }];
+    return [{ path: filenamePrefix + urlToFilename(response.url), content: await response.arrayBuffer() }];
   } else {
     throw new Error(`Unknown resource type '${type}'!`);
   }
 }
 
-async function generateZipFile(moodleFiles: MoodleFile[]) {
+async function generateZipFile(moodleFiles: MoodleFile[]): Promise<void> {
   const zip = new JSZip();
   for (const moodleFile of moodleFiles) {
-    const { name, content } = moodleFile;
-    zip.file(name, content);
+    const { path, content } = moodleFile;
+    zip.file(path, content);
   }
 
   zip
@@ -87,19 +118,18 @@ async function generateZipFile(moodleFiles: MoodleFile[]) {
     })
     .then((blob) => {
       log('Saving the file...');
-      chrome.runtime.sendMessage(
-        {
-          type: 'background-download',
-          data: { url: URL.createObjectURL(blob) },
-        },
-        (response) => {
-          log('File saved: ' + urlToFilename(response));
-        }
-      );
+
+      const fileLink = document.createElement('a');
+      fileLink.href = URL.createObjectURL(blob);
+      fileLink.download = moodleFiles[0].path.split('/')[0] + '.zip';
+      fileLink.click();
+      log('File saved: ' + fileLink.download);
     });
 }
 
-export async function main() {
+export async function main(): Promise<void> {
+  processedResourceUrls.clear();
+
   const initialResource = convertUrlToResource(window.location.href);
   if (initialResource) {
     log('Downloading files...');
@@ -110,5 +140,4 @@ export async function main() {
   } else {
     log(`Unsupported url: ${window.location.href}.`);
   }
-  processedResourceUrls.clear();
 }

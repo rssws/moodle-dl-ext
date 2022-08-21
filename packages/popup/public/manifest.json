@@ -3,9 +3,6 @@
   "description": "Download all moodle files for a course.",
   "version": "0.0.1",
   "manifest_version": 3,
-  "background": {
-    "service_worker": "background/main.js"
-  },
   "permissions": ["storage", "activeTab", "scripting", "downloads"],
   "action": {
     "default_popup": "index.html",
