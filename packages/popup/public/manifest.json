@@ -3,7 +3,7 @@
   "description": "Download all moodle files with one click.",
   "version": "0.0.1",
   "manifest_version": 3,
-  "permissions": ["activeTab", "scripting", "downloads"],
+  "permissions": ["storage", "activeTab", "scripting", "downloads"],
   "action": {
     "default_popup": "index.html",
     "default_icon": {
