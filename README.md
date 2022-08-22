@@ -1,12 +1,21 @@
-# moodle-dl-ext
+# Moodle Downloader Extension
+
+<img src="./assets/moodle-dl-ext-512.png" width=128 height=128 />
+
 Moodle downloader extension for Chrome. 
 The extension is tested with both the [TUM moodle](https://moodle.tum.de) and [the official moodle demo](https://moodle.org/demo).
+
+<img src="./assets/screenshots-640x400.png">
 
 **Notice**: This repository is under active development. Please submit an issue if you found any bugs or have feature requests.
 
 **If you like the tool, please star this repository and share it with your friends. :)**
 
 ## Installation
+### Install from the `Chrome Extension Store`
+(The link will be published after the review.)
+
+### Install from the zip file
 1. Download the extension on the [latest release](https://github.com/rssws/moodle-dl-ext/releases) page.
 2. Unzip the `zip` file to a folder.
 3. Open Chrome and go to `chrome://extensions/`.
@@ -30,11 +39,21 @@ The extension is tested with both the [TUM moodle](https://moodle.tum.de) and [t
    The file will be saved once the download has been completed.
 
 ## Development
+This monorepo is managed using `turborepo`. It contains two packages `@moodle-dl-ext/popup` and `@moodle-dl-ext/content-script`.
+
+### @moodle-dl-ext/popup
+This package is built for the popup page using `React` and `typescript`.
+The `manifest.json` and other static resources can be found in `packages/popup/public`.
+
+### @moodle-dl-ext/content-script
+This package is built for the content script and packaged using `Webpack` and `typescript`.
+
 ### How to build
 1. Clone or download the repository.
 2. Install `yarn`.
-3. Generate the extension using `yarn package`.
-4. Import the extension using the generated folder `output`.
+3. Run `yarn install`.
+4. Generate the extension using `yarn package`.
+5. Import the extension using the generated folder `output`.
 
 ## License
 [GPL-3.0](./LICENSE)
