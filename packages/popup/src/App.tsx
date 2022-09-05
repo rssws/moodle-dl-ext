@@ -15,7 +15,7 @@ function App() {
   const [downloadList, setDownloadedList] = useState<MoodleFile[]>([]);
   const [downloadProgress, setDownloadProgress] = useState<DownloadProgress | undefined>(undefined);
 
-  chrome.runtime.onMessage.addListener(async (message) => {
+  chrome.runtime.onMessage.addListener(async message => {
     if (message.topic === 'status') {
       setStatus(message.payload);
     }
@@ -36,7 +36,7 @@ function App() {
     const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
     chrome.scripting.executeScript({
       target: { tabId: tabs[0].id! },
-      files: ['content-script/main.js'],
+      files: ['content-script/main.js']
     });
   };
 

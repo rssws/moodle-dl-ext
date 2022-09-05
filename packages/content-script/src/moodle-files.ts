@@ -43,7 +43,7 @@ export function convertUrlToResource(url: HTMLAnchorElement | string): Resource 
         return {
           name: getValidFilename(url.innerText),
           type: resourceType,
-          url: result,
+          url: result
         };
       }
     }
@@ -54,7 +54,7 @@ export function convertUrlToResource(url: HTMLAnchorElement | string): Resource 
         return {
           name: getValidFilename(url),
           type: resourceType,
-          url: result,
+          url: result
         };
       }
     }
@@ -68,46 +68,52 @@ function urlToFilename(url: string): string {
 }
 
 function getValidFilename(name: string): string {
-  name = name
+  const newName = name
     .trim()
     .replaceAll(' ', '_')
     .replaceAll(/[^-\w.]/gu, '');
-  if (['', '.', '..'].includes(name)) {
+  if (['', '.', '..'].includes(newName)) {
     console.warn(`filename '${name}' is invalid!`);
     return `invalid-filename_${randStr(8)}`;
   }
-  return name;
+  return newName;
 }
 
 function getFileExtension(name: string): string {
   return name.split('.').slice(1).pop() ?? '';
 }
 
+function getUrlWithoutHashtag(url: string): string {
+  return url.split('#')[0];
+}
+
 export const processedResourceUrls = new Set<string>();
 
 export async function getMoodleFiles(resource: Resource, filenamePrefix = ''): Promise<PartialMoodleFile[]> {
-  if (processedResourceUrls.has(resource.url)) {
+  const url = getUrlWithoutHashtag(resource.url);
+  const { name, type } = resource;
+  if (processedResourceUrls.has(url)) {
     return [];
   }
-  processedResourceUrls.add(resource.url);
+  processedResourceUrls.add(url);
 
-  if (['courseView'].includes(resource.type)) {
+  if (['courseView'].includes(type)) {
     return getMoodleFiles({
       name: 'course view',
       type: 'courseResources',
-      url: resource.url.replace('view', 'resources'),
+      url: url.replace('view', 'resources')
     });
-  } else if (['courseResources', 'modFolderView'].includes(resource.type)) {
-    message<string>('status-log', `Processing ${resource.url}`);
+  } else if (['courseResources', 'modFolderView'].includes(type)) {
+    message<string>('status-log', `Processing ${url}`);
 
-    const response = await fetch(resource.url);
+    const response = await fetch(url);
     const domParser = new DOMParser();
     const document = domParser.parseFromString(await response.text(), 'text/html').documentElement;
     const urls = document.getElementsByTagName('a');
     let moodleFiles: PartialMoodleFile[] = [];
 
     let pagePrefix = filenamePrefix;
-    if (['courseResources'].includes(resource.type)) {
+    if (['courseResources'].includes(type)) {
       const title = document.getElementsByTagName('title')[0].innerText;
       const processedTitle = title ? getValidFilename(title) : '';
       pagePrefix += processedTitle + '/';
@@ -115,14 +121,15 @@ export async function getMoodleFiles(resource: Resource, filenamePrefix = ''): P
 
     const localProcessedResourceUrls = new Set<string>();
     for (const url of urls) {
+      const urlWithoutHashtag = getUrlWithoutHashtag(url.href);
+      if (localProcessedResourceUrls.has(urlWithoutHashtag) || processedResourceUrls.has(urlWithoutHashtag)) {
+        continue;
+      }
+      localProcessedResourceUrls.add(urlWithoutHashtag);
+
       const targetResource = convertUrlToResource(url);
       // The second condition prevents from crawling back to other courses.
       if (targetResource && targetResource.type !== 'courseView') {
-        if (localProcessedResourceUrls.has(targetResource.url) || processedResourceUrls.has(targetResource.url)) {
-          continue;
-        }
-        localProcessedResourceUrls.add(targetResource.url);
-
         let finalPrefix = pagePrefix;
         if (targetResource.type === 'modFolderView') {
           finalPrefix += urlToFilename(url.innerText) + '/';
@@ -131,24 +138,24 @@ export async function getMoodleFiles(resource: Resource, filenamePrefix = ''): P
       }
     }
     return moodleFiles;
-  } else if (['modResourceView', 'pluginfile'].includes(resource.type)) {
-    message<string>('status-log', `Processing ${resource.url}`);
+  } else if (['modResourceView', 'pluginfile'].includes(type)) {
+    message<string>('status-log', `Processing ${url}`);
     const partialMoodleFile: PartialMoodleFile = {
-      resourceName: resource.name,
-      sourceUrl: resource.url,
-      filenamePrefix,
+      resourceName: name,
+      sourceUrl: url,
+      filenamePrefix
     };
 
     return [partialMoodleFile];
   } else {
-    throw new Error(`Unknown resource type '${resource.type}'!`);
+    throw new Error(`Unknown resource type '${type}'!`);
   }
 }
 
 export async function downloadMoodleFiles(partialMoodleFiles: PartialMoodleFile[]): Promise<MoodleFile[]> {
   message('download-progress', {
     current: 0,
-    total: partialMoodleFiles.length,
+    total: partialMoodleFiles.length
   });
   const moodleFiles: MoodleFile[] = [];
   for (const [idx, partialMoodleFile] of partialMoodleFiles.entries()) {
@@ -163,12 +170,20 @@ export async function downloadMoodleFiles(partialMoodleFiles: PartialMoodleFile[
       filename,
       extension,
       content,
-      size: content.byteLength,
+      size: content.byteLength
     };
+
+    // Remove duplicated file extension
+    if (extension !== '') {
+      if (moodleFile.resourceName.endsWith('extension')) {
+        moodleFile.resourceName = moodleFile.resourceName.split('.').slice(0, -1).join();
+      }
+    }
+
     message<MoodleFile>('downloaded', moodleFile);
     message('download-progress', {
       current: idx + 1,
-      total: partialMoodleFiles.length,
+      total: partialMoodleFiles.length
     });
     moodleFiles.push(moodleFile);
   }
@@ -178,16 +193,8 @@ export async function downloadMoodleFiles(partialMoodleFiles: PartialMoodleFile[
 export async function generateZipFile(moodleFiles: MoodleFile[]): Promise<void> {
   const zip = new JSZip();
   for (const moodleFile of moodleFiles) {
-    const { filenamePrefix, extension, content } = moodleFile;
+    const { filenamePrefix, extension, content, resourceName } = moodleFile;
 
-    let { resourceName } = moodleFile;
-
-    // Remove duplicated file extension
-    if (extension !== '') {
-      if (resourceName.endsWith('extension')) {
-        resourceName = resourceName.split('.').slice(0, -1).join();
-      }
-    }
     let path = filenamePrefix + resourceName + '.' + extension;
     if (zip.file(path)) {
       // If the path already exists, appending random string
@@ -200,9 +207,9 @@ export async function generateZipFile(moodleFiles: MoodleFile[]): Promise<void> 
   zip
     .generateAsync({
       type: 'blob',
-      compression: 'STORE',
+      compression: 'STORE'
     })
-    .then((blob) => {
+    .then(blob => {
       message<string>('status-log', 'Saving the file...');
 
       const fileLink = document.createElement('a');
@@ -217,6 +224,6 @@ export function init() {
   processedResourceUrls.clear();
   message('download-progress', {
     current: 0,
-    total: 1,
+    total: 1
   });
 }

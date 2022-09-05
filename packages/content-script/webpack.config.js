@@ -8,7 +8,7 @@ const config = {
   entry: './src/main.ts',
   output: {
     path: path.resolve(__dirname, 'dist'),
-    filename: 'main.js',
+    filename: 'main.js'
   },
   plugins: [
     // Add your plugins here
@@ -19,20 +19,20 @@ const config = {
       {
         test: /\.(ts|tsx)$/i,
         loader: 'ts-loader',
-        exclude: ['/node_modules/'],
+        exclude: ['/node_modules/']
       },
       {
         test: /\.(eot|svg|ttf|woff|woff2|png|jpg|gif)$/i,
-        type: 'asset',
-      },
+        type: 'asset'
+      }
 
       // Add your rules for custom modules here
       // Learn more about loaders from https://webpack.js.org/loaders/
-    ],
+    ]
   },
   resolve: {
-    extensions: ['.tsx', '.ts', '.jsx', '.js', '...'],
-  },
+    extensions: ['.tsx', '.ts', '.jsx', '.js', '...']
+  }
 };
 
 module.exports = () => {
