@@ -1,16 +1,31 @@
-import JSZip from 'jszip';
+import JSZip, { file } from 'jszip';
 import { message } from './message';
 import { randStr } from './util';
 
 type ResourceType = 'courseView' | 'courseResources' | 'modFolderView' | 'modResourceView' | 'pluginfile';
 interface Resource {
+  name: string;
   type: ResourceType;
   url: string;
 }
 
-export interface MoodleFile {
-  path: string;
+export interface PartialMoodleFile {
+  resourceName: string;
+  sourceUrl: string;
+  filenamePrefix: string;
+}
+
+export type MoodleFile = PartialMoodleFile & {
+  targetUrl: string;
+  filename: string;
+  extension: string;
   content: ArrayBuffer;
+  size: number;
+};
+
+export interface DownloadProgress {
+  current: number;
+  total: number;
 }
 
 const filters = new Map<ResourceType, RegExp>();
@@ -20,16 +35,31 @@ filters.set('modResourceView', /(.*\/resource\/view\.php\?id=[0-9]+).*/);
 filters.set('modFolderView', /(.*\/folder\/view\.php\?id=[0-9]+).*/);
 filters.set('pluginfile', /(.*\/pluginfile\.php.*)/);
 
-export function convertUrlToResource(url: string): Resource | undefined {
-  for (const [resourceType, regExp] of filters.entries()) {
-    const result = url.match(regExp)?.[1];
-    if (result) {
-      return {
-        type: resourceType,
-        url: result,
-      };
+export function convertUrlToResource(url: HTMLAnchorElement | string): Resource | undefined {
+  if (url instanceof HTMLAnchorElement) {
+    for (const [resourceType, regExp] of filters.entries()) {
+      const result = url.href.match(regExp)?.[1];
+      if (result) {
+        return {
+          name: getValidFilename(url.innerText),
+          type: resourceType,
+          url: result,
+        };
+      }
+    }
+  } else {
+    for (const [resourceType, regExp] of filters.entries()) {
+      const result = url.match(regExp)?.[1];
+      if (result) {
+        return {
+          name: getValidFilename(url),
+          type: resourceType,
+          url: result,
+        };
+      }
     }
   }
+
   return undefined;
 }
 
@@ -49,29 +79,35 @@ function getValidFilename(name: string): string {
   return name;
 }
 
+function getFileExtension(name: string): string {
+  return name.split('.').slice(1).pop() ?? '';
+}
+
 export const processedResourceUrls = new Set<string>();
 
-export async function getMoodleFiles(resource: Resource, filenamePrefix = ''): Promise<MoodleFile[]> {
-  const { url, type } = resource;
-
-  if (processedResourceUrls.has(url)) {
+export async function getMoodleFiles(resource: Resource, filenamePrefix = ''): Promise<PartialMoodleFile[]> {
+  if (processedResourceUrls.has(resource.url)) {
     return [];
   }
-  processedResourceUrls.add(url);
+  processedResourceUrls.add(resource.url);
 
-  if (['courseView'].includes(type)) {
-    return getMoodleFiles({ type: 'courseResources', url: resource.url.replace('view', 'resources') });
-  } else if (['courseResources', 'modFolderView'].includes(type)) {
-    message('status', `Processing ${url}`);
+  if (['courseView'].includes(resource.type)) {
+    return getMoodleFiles({
+      name: 'course view',
+      type: 'courseResources',
+      url: resource.url.replace('view', 'resources'),
+    });
+  } else if (['courseResources', 'modFolderView'].includes(resource.type)) {
+    message<string>('status-log', `Processing ${resource.url}`);
 
-    const response = await fetch(url);
+    const response = await fetch(resource.url);
     const domParser = new DOMParser();
     const document = domParser.parseFromString(await response.text(), 'text/html').documentElement;
     const urls = document.getElementsByTagName('a');
-    let moodleFiles: MoodleFile[] = [];
+    let moodleFiles: PartialMoodleFile[] = [];
 
     let pagePrefix = filenamePrefix;
-    if (['courseResources'].includes(type)) {
+    if (['courseResources'].includes(resource.type)) {
       const title = document.getElementsByTagName('title')[0].innerText;
       const processedTitle = title ? getValidFilename(title) : '';
       pagePrefix += processedTitle + '/';
@@ -79,7 +115,7 @@ export async function getMoodleFiles(resource: Resource, filenamePrefix = ''): P
 
     const localProcessedResourceUrls = new Set<string>();
     for (const url of urls) {
-      const targetResource = convertUrlToResource(url.href);
+      const targetResource = convertUrlToResource(url);
       // The second condition prevents from crawling back to other courses.
       if (targetResource && targetResource.type !== 'courseView') {
         if (localProcessedResourceUrls.has(targetResource.url) || processedResourceUrls.has(targetResource.url)) {
@@ -95,19 +131,69 @@ export async function getMoodleFiles(resource: Resource, filenamePrefix = ''): P
       }
     }
     return moodleFiles;
-  } else if (['modResourceView', 'pluginfile'].includes(type)) {
-    message('status', `Downloading ${url}`);
-    const response = await fetch(url);
-    return [{ path: filenamePrefix + urlToFilename(response.url), content: await response.arrayBuffer() }];
+  } else if (['modResourceView', 'pluginfile'].includes(resource.type)) {
+    message<string>('status-log', `Processing ${resource.url}`);
+    const partialMoodleFile: PartialMoodleFile = {
+      resourceName: resource.name,
+      sourceUrl: resource.url,
+      filenamePrefix,
+    };
+
+    return [partialMoodleFile];
   } else {
-    throw new Error(`Unknown resource type '${type}'!`);
+    throw new Error(`Unknown resource type '${resource.type}'!`);
   }
+}
+
+export async function downloadMoodleFiles(partialMoodleFiles: PartialMoodleFile[]): Promise<MoodleFile[]> {
+  message('download-progress', {
+    current: 0,
+    total: partialMoodleFiles.length,
+  });
+  const moodleFiles: MoodleFile[] = [];
+  for (const [idx, partialMoodleFile] of partialMoodleFiles.entries()) {
+    message<string>('status-log', `Downloading ${partialMoodleFile.resourceName}`);
+    const response = await fetch(partialMoodleFile.sourceUrl);
+    const filename = urlToFilename(response.url);
+    const extension = getFileExtension(filename);
+    const content = await response.arrayBuffer();
+    const moodleFile: MoodleFile = {
+      ...partialMoodleFile,
+      targetUrl: response.url,
+      filename,
+      extension,
+      content,
+      size: content.byteLength,
+    };
+    message<MoodleFile>('downloaded', moodleFile);
+    message('download-progress', {
+      current: idx + 1,
+      total: partialMoodleFiles.length,
+    });
+    moodleFiles.push(moodleFile);
+  }
+  return moodleFiles;
 }
 
 export async function generateZipFile(moodleFiles: MoodleFile[]): Promise<void> {
   const zip = new JSZip();
   for (const moodleFile of moodleFiles) {
-    const { path, content } = moodleFile;
+    const { filenamePrefix, extension, content } = moodleFile;
+
+    let { resourceName } = moodleFile;
+
+    // Remove duplicated file extension
+    if (extension !== '') {
+      if (resourceName.endsWith('extension')) {
+        resourceName = resourceName.split('.').slice(0, -1).join();
+      }
+    }
+    let path = filenamePrefix + resourceName + '.' + extension;
+    if (zip.file(path)) {
+      // If the path already exists, appending random string
+      path = filenamePrefix + resourceName + '_' + randStr(8) + '.' + extension;
+    }
+
     zip.file(path, content);
   }
 
@@ -117,16 +203,20 @@ export async function generateZipFile(moodleFiles: MoodleFile[]): Promise<void> 
       compression: 'STORE',
     })
     .then((blob) => {
-      message('status', 'Saving the file...');
+      message<string>('status-log', 'Saving the file...');
 
       const fileLink = document.createElement('a');
       fileLink.href = URL.createObjectURL(blob);
-      fileLink.download = moodleFiles[0].path.split('/')[0] + '.zip';
+      fileLink.download = moodleFiles[0].filenamePrefix.slice(0, -1) + '.zip';
       fileLink.click();
-      message('status', 'File saved: ' + fileLink.download);
+      message<string>('status-log', 'File saved: ' + fileLink.download);
     });
 }
 
 export function init() {
   processedResourceUrls.clear();
+  message('download-progress', {
+    current: 0,
+    total: 1,
+  });
 }
