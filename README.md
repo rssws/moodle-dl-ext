@@ -1,5 +1,7 @@
 # Moodle Downloader Extension
 
+![build](https://github.com/rssws/moodle-dl-ext/actions/workflows/build.yml/badge.svg?event=push)
+
 <img src="./assets/moodle-dl-ext-512.png" width=128 height=128 />
 
 Moodle downloader extension for Chrome. 
