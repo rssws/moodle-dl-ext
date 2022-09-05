@@ -23,7 +23,7 @@ function MoodleFileList(props: MoodleFileListProps) {
           <TableRow>
             <TableCell>Name</TableCell>
             <TableCell>Type</TableCell>
-            <TableCell>Size</TableCell>
+            <TableCell align='right'>Size</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
