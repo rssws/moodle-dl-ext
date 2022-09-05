@@ -5,6 +5,7 @@
     "ecmaVersion": 6,
     "sourceType": "module"
   },
+  "ignorePatterns": ["dist", "node_modules", "build", "output"],
   "env": {
     "browser": false,
     "node": true,
@@ -22,7 +23,7 @@
     "brace-style": "off",
     "@typescript-eslint/brace-style": [
       "error",
-      "stroustrup",
+      "1tbs",
       {
         "allowSingleLine": true
       }
@@ -139,7 +140,7 @@
     "quotes": "off",
     "@typescript-eslint/quotes": [
       "error",
-      "double",
+      "single",
       {
         "avoidEscape": true,
         "allowTemplateLiterals": true
@@ -171,7 +172,7 @@
     "curly": ["error", "multi-line"],
     "dot-notation": "error",
     "eqeqeq": "error",
-    "linebreak-style": ["error", "windows"],
+    "linebreak-style": ["error", "unix"],
     "new-parens": "error",
     "no-caller": "error",
     "no-duplicate-case": "error",
@@ -218,6 +219,20 @@
     "space-in-parens": "error",
     "unicode-bom": ["error", "never"],
     "use-isnan": "error",
-    "no-console": ["error", { "allow": ["warn", "error"] }]
+    "no-console": ["error", { "allow": ["warn", "error"] }],
+    "@typescript-eslint/explicit-function-return-type": "error",
+    "import/named": "error",
+    "import/default": "error",
+    "import/namespace": "error",
+    "import/no-absolute-path": "error",
+    "import/no-dynamic-require": "error",
+    "import/no-internal-modules": "error",
+    "import/no-self-import": "error",
+    "import/no-cycle": "error",
+    "import/no-useless-path-segments": "error",
+    "import/no-relative-parent-imports": "error",
+    "import/export": "error",
+    "import/order": "error",
+    "import/no-duplicates": "error"
   }
 }
