@@ -175,7 +175,7 @@ export async function downloadMoodleFiles(partialMoodleFiles: PartialMoodleFile[
 
     // Remove duplicated file extension
     if (extension !== '') {
-      if (moodleFile.resourceName.endsWith('extension')) {
+      if (moodleFile.resourceName.endsWith(extension)) {
         moodleFile.resourceName = moodleFile.resourceName.split('.').slice(0, -1).join();
       }
     }
@@ -191,6 +191,11 @@ export async function downloadMoodleFiles(partialMoodleFiles: PartialMoodleFile[
 }
 
 export async function generateZipFile(moodleFiles: MoodleFile[]): Promise<void> {
+  if (moodleFiles.length === 0) {
+    message<string>('status-log', 'No file found.');
+    return;
+  }
+
   const zip = new JSZip();
   for (const moodleFile of moodleFiles) {
     const { filenamePrefix, extension, content, resourceName } = moodleFile;
