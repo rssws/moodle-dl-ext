@@ -8,5 +8,5 @@
     "composite": true
   },
   "include": ["src/**/*.ts"],
-  "files": []
+  "exclude": ["build/**/*", "node_modules/**/*"]
 }

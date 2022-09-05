@@ -1,6 +1,6 @@
-export function log(content: string): void {
+export function message(topic: string, payload: any): void {
   chrome.runtime.sendMessage({
-    type: 'popup-log',
-    data: { content },
+    topic,
+    payload,
   });
 }

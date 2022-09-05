@@ -10,10 +10,17 @@
     "build:prod": "webpack --mode=production --node-env=production",
     "watch": "webpack --watch",
     "lint": "eslint --ext .ts . && prettier . --config ../../.prettierrc --ignore-path ../../.prettierignore -c",
-    "lint:fix": "set TIMING=1 && eslint --ext .ts . --fix --quiet && prettier . --config ../../.prettierrc -w --loglevel error"
+    "lint:fix": "eslint --ext .ts . --fix --quiet && prettier . --config ../../.prettierrc -w --loglevel error"
   },
   "author": "rssws",
   "license": "GPL-3.0",
+  "main": "./dist/main.js",
+  "types": "./build/index.d.ts",
+  "files": [
+    "build/**/*.d.ts",
+    "build/**/*.d.ts.map",
+    "dist/**/*.js"
+  ],
   "dependencies": {
     "jszip": "^3.10.1"
   },

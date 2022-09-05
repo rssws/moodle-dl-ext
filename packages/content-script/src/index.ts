@@ -1,3 +1,1 @@
-import { main } from './moodle-files';
-
-main();
+export { MoodleFile } from './moodle-files';

@@ -1,5 +1,5 @@
 import JSZip from 'jszip';
-import { log } from './message';
+import { message } from './message';
 import { randStr } from './util';
 
 type ResourceType = 'courseView' | 'courseResources' | 'modFolderView' | 'modResourceView' | 'pluginfile';
@@ -8,7 +8,7 @@ interface Resource {
   url: string;
 }
 
-interface MoodleFile {
+export interface MoodleFile {
   path: string;
   content: ArrayBuffer;
 }
@@ -20,7 +20,7 @@ filters.set('modResourceView', /(.*\/resource\/view\.php\?id=[0-9]+).*/);
 filters.set('modFolderView', /(.*\/folder\/view\.php\?id=[0-9]+).*/);
 filters.set('pluginfile', /(.*\/pluginfile\.php.*)/);
 
-function convertUrlToResource(url: string): Resource | undefined {
+export function convertUrlToResource(url: string): Resource | undefined {
   for (const [resourceType, regExp] of filters.entries()) {
     const result = url.match(regExp)?.[1];
     if (result) {
@@ -49,9 +49,9 @@ function getValidFilename(name: string): string {
   return name;
 }
 
-const processedResourceUrls = new Set<string>();
+export const processedResourceUrls = new Set<string>();
 
-async function getMoodleFiles(resource: Resource, filenamePrefix = ''): Promise<MoodleFile[]> {
+export async function getMoodleFiles(resource: Resource, filenamePrefix = ''): Promise<MoodleFile[]> {
   const { url, type } = resource;
 
   if (processedResourceUrls.has(url)) {
@@ -62,7 +62,7 @@ async function getMoodleFiles(resource: Resource, filenamePrefix = ''): Promise<
   if (['courseView'].includes(type)) {
     return getMoodleFiles({ type: 'courseResources', url: resource.url.replace('view', 'resources') });
   } else if (['courseResources', 'modFolderView'].includes(type)) {
-    log(`Processing ${url}`);
+    message('status', `Processing ${url}`);
 
     const response = await fetch(url);
     const domParser = new DOMParser();
@@ -96,7 +96,7 @@ async function getMoodleFiles(resource: Resource, filenamePrefix = ''): Promise<
     }
     return moodleFiles;
   } else if (['modResourceView', 'pluginfile'].includes(type)) {
-    log(`Downloading ${url}`);
+    message('status', `Downloading ${url}`);
     const response = await fetch(url);
     return [{ path: filenamePrefix + urlToFilename(response.url), content: await response.arrayBuffer() }];
   } else {
@@ -104,7 +104,7 @@ async function getMoodleFiles(resource: Resource, filenamePrefix = ''): Promise<
   }
 }
 
-async function generateZipFile(moodleFiles: MoodleFile[]): Promise<void> {
+export async function generateZipFile(moodleFiles: MoodleFile[]): Promise<void> {
   const zip = new JSZip();
   for (const moodleFile of moodleFiles) {
     const { path, content } = moodleFile;
@@ -117,27 +117,16 @@ async function generateZipFile(moodleFiles: MoodleFile[]): Promise<void> {
       compression: 'STORE',
     })
     .then((blob) => {
-      log('Saving the file...');
+      message('status', 'Saving the file...');
 
       const fileLink = document.createElement('a');
       fileLink.href = URL.createObjectURL(blob);
       fileLink.download = moodleFiles[0].path.split('/')[0] + '.zip';
       fileLink.click();
-      log('File saved: ' + fileLink.download);
+      message('status', 'File saved: ' + fileLink.download);
     });
 }
 
-export async function main(): Promise<void> {
+export function init() {
   processedResourceUrls.clear();
-
-  const initialResource = convertUrlToResource(window.location.href);
-  if (initialResource) {
-    log('Downloading files...');
-    const moodleFiles = await getMoodleFiles(initialResource);
-
-    log('Generating zip file...');
-    await generateZipFile(moodleFiles);
-  } else {
-    log(`Unsupported url: ${window.location.href}.`);
-  }
 }
