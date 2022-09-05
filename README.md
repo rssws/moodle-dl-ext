@@ -5,7 +5,9 @@
 Moodle downloader extension for Chrome. 
 The extension is tested with both the [TUM moodle](https://moodle.tum.de) and [the official moodle demo](https://moodle.org/demo).
 
-<img src="./assets/screenshots-640x400.png">
+<img src="./assets/screenshots-640x400.png" border=1>
+
+<img src="./assets/screenshot-0.2.0-1.png" width=640 border=1>
 
 **Notice**: This repository is under active development. Please submit an issue if you found any bugs or have feature requests.
 
@@ -50,8 +52,10 @@ This package is built for the content script and packaged using `Webpack` and `t
 
 ### How to build
 1. Clone or download the repository.
-2. Install `yarn`.
-3. Run `yarn install`.
+2. Install `yarn` v2.
+   1. Run `npm install -g yarn` to install `yarn`.
+   2. Run `yarn set version berry` to enable `yarn` v2.
+3. Run `yarn install` to install dependencies.
 4. Generate the extension using `yarn package`.
 5. Import the extension using the generated folder `output`.
 
