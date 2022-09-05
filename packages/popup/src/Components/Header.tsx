@@ -10,7 +10,7 @@ function Header() {
   return (
     <Grid container spacing={2}>
       <Grid xs={2}>
-        <img src="images/moodle-dl-ext-48.png" />
+        <img src="images/moodle-dl-ext-48.png" alt="Moodle Downloader Logo" />
       </Grid>
       <Grid xs={8}>
         <Typography variant="h5" align="left">
