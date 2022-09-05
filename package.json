@@ -1,6 +1,6 @@
 {
   "name": "moodle-dl-ext",
-  "version": "0.0.1",
+  "version": "0.2.0",
   "packageManager": "yarn@3.2.3",
   "description": "Moodle downloader extension for Chrome",
   "private": true,
