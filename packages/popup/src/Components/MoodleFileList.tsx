@@ -30,13 +30,19 @@ function MoodleFileList(props: MoodleFileListProps) {
           {props.data.map((row, idx) => (
             <TableRow key={idx} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
               <TableCell component="th" scope="row">
-                <Typography variant="body2" align="left" style={{ wordWrap: "break-word" }} width={350}>{row.resourceName}</Typography>
+                <Typography variant="body2" align="left" style={{ wordWrap: 'break-word' }} width={350}>
+                  {row.resourceName}
+                </Typography>
               </TableCell>
               <TableCell component="th" scope="row">
-                <Typography variant="body2" align="left">{row.extension.toLowerCase()}</Typography>
+                <Typography variant="body2" align="left">
+                  {row.extension.toLowerCase()}
+                </Typography>
               </TableCell>
               <TableCell component="th" scope="row" align="right">
-                <Typography variant="body2" align="right">{formatBytes(row.size)}</Typography>
+                <Typography variant="body2" align="right">
+                  {formatBytes(row.size)}
+                </Typography>
               </TableCell>
             </TableRow>
           ))}

@@ -4,10 +4,10 @@ import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Grid';
-import Link from '@mui/material/Link';
 import MoodleFileList from './Components/MoodleFileList';
 import { MoodleFile, Status, DownloadProgress } from '@moodle-dl-ext/content-script';
 import LinearProgress from '@mui/material/LinearProgress';
+import Header from './Components/Header';
 
 function App() {
   const [status, setStatus] = useState<Status>('initialized');
@@ -40,40 +40,10 @@ function App() {
     });
   };
 
-  const handleGitHubLinkOnClick = () => {
-    chrome.tabs.create({ url: 'https://github.com/rssws/moodle-dl-ext' });
-  };
-
-  const handleAuthorOnClick = () => {
-    chrome.tabs.create({ url: 'https://github.com/rssws' });
-  };
-
   return (
     <div className="App">
       <Stack spacing={2}>
-        <Grid container spacing={2}>
-          <Grid xs={2}>
-            <img src="images/moodle-dl-ext-48.png" />
-          </Grid>
-          <Grid xs={8}>
-            <Typography variant="h5" align="left">
-              Moodle Downloader
-            </Typography>
-          </Grid>
-          <Grid xs={2}>
-            <Typography variant="body1" align="right">
-              <Link component="button" onClick={handleGitHubLinkOnClick} underline="hover">
-                GitHub
-              </Link>
-            </Typography>
-            <Typography variant="body1" align="right">
-              by{' '}
-              <Link component="button" onClick={handleAuthorOnClick} underline="hover">
-                rssws
-              </Link>
-            </Typography>
-          </Grid>
-        </Grid>
+        <Header />
         <Typography variant="body2" align="left" hidden={status === 'initialized'} paddingX={2}>
           {statusLog}
         </Typography>
