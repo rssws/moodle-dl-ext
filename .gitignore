@@ -29,4 +29,5 @@ yarn-error.log*
 *.psd
 publish
 
-.yarn
+.yarn/cache
+.yarn/install-state.gz

@@ -29,7 +29,7 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "lint": "eslint --ext .ts,.tsx . && prettier . --config ../../.prettierrc --ignore-path ../../.prettierignore -c",
-    "lint:fix": "eslint --ext .ts,.tsx . --fix --quiet && prettier . --config ../../.prettierrc -w --loglevel error"
+    "lint:fix": "eslint --ext .ts,.tsx . --fix && prettier . --config ../../.prettierrc -w --loglevel error"
   },
   "eslintConfig": {
     "extends": [
