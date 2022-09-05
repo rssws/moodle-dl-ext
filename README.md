@@ -52,9 +52,9 @@ This package is built for the content script and packaged using `Webpack` and `t
 
 ### How to build
 1. Clone or download the repository.
-2. Install `yarn` v2.
+2. Install `yarn`.
    1. Run `npm install -g yarn` to install `yarn`.
-   2. Run `yarn set version berry` to enable `yarn` v2.
+   2. Run `yarn set version berry` to enable the modern `yarn`.
 3. Run `yarn install` to install dependencies.
 4. Generate the extension using `yarn package`.
 5. Import the extension using the generated folder `output`.
