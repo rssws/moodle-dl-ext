@@ -19,7 +19,8 @@
     "lint:fix": "turbo run lint:fix --force"
   },
   "workspaces": [
-    "packages/content-script"
+    "packages/content-script",
+    "packages/popup"
   ],
   "devDependencies": {
     "eslint": "^8.22.0",
