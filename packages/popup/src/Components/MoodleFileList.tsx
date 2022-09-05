@@ -1,4 +1,4 @@
-import { TableContainer, Paper, Table, TableHead, TableRow, TableCell, TableBody } from '@mui/material';
+import { TableContainer, Paper, Table, TableHead, TableRow, TableCell, TableBody, Typography } from '@mui/material';
 import { MoodleFile } from '@moodle-dl-ext/content-script';
 
 function formatBytes(bytes: number, decimals?: number): string {
@@ -30,13 +30,13 @@ function MoodleFileList(props: MoodleFileListProps) {
           {props.data.map((row, idx) => (
             <TableRow key={idx} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
               <TableCell component="th" scope="row">
-                {row.resourceName}
+                <Typography variant="body2" align="left" style={{ wordWrap: "break-word" }} width={350}>{row.resourceName}</Typography>
               </TableCell>
               <TableCell component="th" scope="row">
-                {row.extension.toLowerCase()}
+                <Typography variant="body2" align="left">{row.extension.toLowerCase()}</Typography>
               </TableCell>
-              <TableCell component="th" scope="row">
-                {formatBytes(row.size)}
+              <TableCell component="th" scope="row" align="right">
+                <Typography variant="body2" align="right">{formatBytes(row.size)}</Typography>
               </TableCell>
             </TableRow>
           ))}
