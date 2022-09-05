@@ -24,7 +24,6 @@ jobs:
             */*/node_modules
             .yarn
           key: ${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
-      - run: yarn set version berry
       - run: yarn install --frozen-lockfile
       - run: yarn lint --force
   build:
@@ -44,7 +43,6 @@ jobs:
             */*/node_modules
             .yarn
           key: ${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
-      - run: yarn set version berry
       - run: yarn install --frozen-lockfile
       - run: |
           yarn build --force
