@@ -3,7 +3,7 @@
   "pipeline": {
     "pre-build": {},
     "build": {
-      "dependsOn": ["pre-build"]
+      "dependsOn": ["^build", "pre-build"]
     },
     "package": {
       "dependsOn": ["build"]

@@ -5,6 +5,7 @@
   "dependencies": {
     "@emotion/react": "^11.10.0",
     "@emotion/styled": "^11.10.0",
+    "@moodle-dl-ext/content-script": "link:../content-script",
     "@mui/icons-material": "^5.8.4",
     "@mui/material": "^5.10.1",
     "@testing-library/jest-dom": "^5.16.5",
@@ -28,7 +29,7 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "lint": "eslint --ext .ts,.tsx . && prettier . --config ../../.prettierrc --ignore-path ../../.prettierignore -c",
-    "lint:fix": "set TIMING=1 && eslint --ext .ts,.tsx . --fix --quiet && prettier . --config ../../.prettierrc -w --loglevel error"
+    "lint:fix": "eslint --ext .ts,.tsx . --fix --quiet && prettier . --config ../../.prettierrc -w --loglevel error"
   },
   "eslintConfig": {
     "extends": [
