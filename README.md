@@ -13,7 +13,7 @@ The extension is tested with both the [TUM moodle](https://moodle.tum.de) and [t
 
 ## Installation
 ### Install from the `Chrome Extension Store`
-(The link will be published after the review.)
+Visit the [Moodle Downloader Extension](https://chrome.google.com/webstore/detail/moodle-downloader/egdkcpdcopinmhfphdmdagnpogclbpln) in the Chrome Extension Store.
 
 ### Install from the zip file
 1. Download the extension on the [latest release](https://github.com/rssws/moodle-dl-ext/releases) page.
