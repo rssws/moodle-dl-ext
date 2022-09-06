@@ -225,7 +225,7 @@ export async function generateZipFile(moodleFiles: MoodleFile[]): Promise<void> 
     });
 }
 
-export function init() {
+export function init(): void {
   processedResourceUrls.clear();
   message('download-progress', {
     current: 0,
