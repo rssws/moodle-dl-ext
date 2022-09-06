@@ -24,7 +24,7 @@ jobs:
             */*/node_modules
             .yarn
           key: ${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
-      - run: yarn install --frozen-lockfile
+      - run: yarn install --immutable
       - run: yarn lint --force
   build:
     runs-on: ubuntu-latest
@@ -43,7 +43,7 @@ jobs:
             */*/node_modules
             .yarn
           key: ${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
-      - run: yarn install --frozen-lockfile
+      - run: yarn install --immutable
       - run: |
           yarn build --force
           yarn package --force
