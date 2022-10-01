@@ -11,7 +11,7 @@ The extension is tested with both the [TUM moodle](https://moodle.tum.de) and [t
 
 <img src="./assets/screenshot-0.2.0-1.png" width=640 border=1>
 
-**Notice**: This repository is under active development. Please submit an issue if you found any bugs or have feature requests.
+Please submit an issue if you found any bugs or have feature requests.
 
 **If you like the tool, please star this repository and share it with your friends. :)**
 
