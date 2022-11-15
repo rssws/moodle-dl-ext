@@ -92,20 +92,27 @@ const resourceUrlsFound = new Set<string>();
 
 export async function getMoodleFiles(initialResource: Resource): Promise<PartialMoodleFile[]> {
   crawlingQueue.push([initialResource, '']);
-  let moodleFiles: PartialMoodleFile[] = [];
+  const moodleFiles: PartialMoodleFile[] = [];
 
   while (crawlingQueue.length > 0) {
-    let [currentResource, currentPath] = crawlingQueue.shift()!;
+    const pair = crawlingQueue.at(0)!;
+    const currentResource = pair[0];
+    let currentPath = pair[1];
+    crawlingQueue.shift();
+
     const url = getUrlWithoutHashtag(currentResource.url);
 
     const { name, type } = currentResource;
 
     if (['courseView'].includes(type)) {
-      crawlingQueue.push([{
-        name: 'course view',
-        type: 'courseResources',
-        url: url.replace('view', 'resources')
-      }, '']);
+      crawlingQueue.push([
+        {
+          name: 'course view',
+          type: 'courseResources',
+          url: url.replace('view', 'resources')
+        },
+        ''
+      ]);
     } else if (['courseResources', 'modFolderView'].includes(type)) {
       message<string>('status-log', `Processing ${url}`);
 
@@ -147,7 +154,7 @@ export async function getMoodleFiles(initialResource: Resource): Promise<Partial
         sourceUrl: url,
         filenamePrefix: currentPath
       };
-      console.log(partialMoodleFile);
+
       moodleFiles.push(partialMoodleFile);
     } else {
       throw new Error(`Unknown resource type '${type}'!`);
