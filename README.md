@@ -1,5 +1,6 @@
 # Moodle Downloader Extension
 
+![codeql-analysis](https://github.com/rssws/moodle-dl-ext/actions/workflows/codeql-analysis.yml/badge.svg?event=push)
 ![build](https://github.com/rssws/moodle-dl-ext/actions/workflows/build.yml/badge.svg?event=push)
 
 <img src="./assets/moodle-dl-ext-512.png" width=128 height=128 />
@@ -60,6 +61,14 @@ This package is built for the content script and packaged using `Webpack` and `t
 3. Run `yarn install` to install dependencies.
 4. Generate the extension using `yarn package`.
 5. Import the extension using the generated folder `output`.
+
+## Contribution
+
+Your contribution is welcomed!
+
+Please submit an issue first for feature requests or bug reports.
+
+If you want to contribute directly to the code, create a PR from your fork ([How-to](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request-from-a-fork)).
 
 ## License
 [GPL-3.0](./LICENSE)
