@@ -1,4 +1,4 @@
-import JSZip, { file } from 'jszip';
+import JSZip from 'jszip';
 import { message } from './message';
 import { randStr } from './util';
 
@@ -87,69 +87,81 @@ function getUrlWithoutHashtag(url: string): string {
   return url.split('#')[0];
 }
 
-export const processedResourceUrls = new Set<string>();
+const crawlingQueue: [Resource, string][] = [];
+const resourceUrlsFound = new Set<string>();
 
-export async function getMoodleFiles(resource: Resource, filenamePrefix = ''): Promise<PartialMoodleFile[]> {
-  const url = getUrlWithoutHashtag(resource.url);
-  const { name, type } = resource;
-  if (processedResourceUrls.has(url)) {
-    return [];
-  }
-  processedResourceUrls.add(url);
+export async function getMoodleFiles(initialResource: Resource): Promise<PartialMoodleFile[]> {
+  crawlingQueue.push([initialResource, '']);
+  const moodleFiles: PartialMoodleFile[] = [];
 
-  if (['courseView'].includes(type)) {
-    return getMoodleFiles({
-      name: 'course view',
-      type: 'courseResources',
-      url: url.replace('view', 'resources')
-    });
-  } else if (['courseResources', 'modFolderView'].includes(type)) {
-    message<string>('status-log', `Processing ${url}`);
+  while (crawlingQueue.length > 0) {
+    const pair = crawlingQueue.at(0)!;
+    const currentResource = pair[0];
+    let currentPath = pair[1];
+    crawlingQueue.shift();
 
-    const response = await fetch(url);
-    const domParser = new DOMParser();
-    const document = domParser.parseFromString(await response.text(), 'text/html').documentElement;
-    const urls = document.getElementsByTagName('a');
-    let moodleFiles: PartialMoodleFile[] = [];
+    const url = getUrlWithoutHashtag(currentResource.url);
 
-    let pagePrefix = filenamePrefix;
-    if (['courseResources'].includes(type)) {
-      const title = document.getElementsByTagName('title')[0].innerText;
-      const processedTitle = title ? getValidFilename(title) : '';
-      pagePrefix += processedTitle + '/';
-    }
+    const { name, type } = currentResource;
 
-    const localProcessedResourceUrls = new Set<string>();
-    for (const url of urls) {
-      const urlWithoutHashtag = getUrlWithoutHashtag(url.href);
-      if (localProcessedResourceUrls.has(urlWithoutHashtag) || processedResourceUrls.has(urlWithoutHashtag)) {
-        continue;
+    if (['courseView'].includes(type)) {
+      crawlingQueue.push([
+        {
+          name: 'course view',
+          type: 'courseResources',
+          url: url.replace('view', 'resources')
+        },
+        ''
+      ]);
+    } else if (['courseResources', 'modFolderView'].includes(type)) {
+      message<string>('status-log', `Processing ${url}`);
+
+      const response = await fetch(url);
+      const domParser = new DOMParser();
+      const document = domParser.parseFromString(await response.text(), 'text/html');
+      const page = document.getElementById('page');
+      // Get urls from the elememt with id 'page' first to narrow down the list of urls
+      const urls = page?.getElementsByTagName('a') ?? document.getElementsByTagName('a');
+
+      if (type === 'courseResources') {
+        const title = document.getElementsByTagName('title')[0].innerText;
+        const processedTitle = title ? getValidFilename(title) : '';
+        currentPath += processedTitle + '/';
       }
-      localProcessedResourceUrls.add(urlWithoutHashtag);
 
-      const targetResource = convertUrlToResource(url);
-      // The second condition prevents from crawling back to other courses.
-      if (targetResource && targetResource.type !== 'courseView') {
-        let finalPrefix = pagePrefix;
-        if (targetResource.type === 'modFolderView') {
-          finalPrefix += urlToFilename(url.innerText) + '/';
+      for (const url of urls) {
+        const urlWithoutHashtag = getUrlWithoutHashtag(url.href);
+        const targetResource = convertUrlToResource(url);
+
+        // Skip urls that are not valid resources or have already been processed
+        if (!targetResource || resourceUrlsFound.has(urlWithoutHashtag)) {
+          continue;
         }
-        moodleFiles = moodleFiles.concat(await getMoodleFiles(targetResource, finalPrefix));
-      }
-    }
-    return moodleFiles;
-  } else if (['modResourceView', 'pluginfile'].includes(type)) {
-    message<string>('status-log', `Processing ${url}`);
-    const partialMoodleFile: PartialMoodleFile = {
-      resourceName: name,
-      sourceUrl: url,
-      filenamePrefix
-    };
 
-    return [partialMoodleFile];
-  } else {
-    throw new Error(`Unknown resource type '${type}'!`);
+        if (targetResource.type !== 'courseView') {
+          let targetPath = currentPath;
+          if (targetResource.type === 'modFolderView') {
+            targetPath += urlToFilename(url.innerText) + '/';
+          }
+          crawlingQueue.push([targetResource, targetPath]);
+          resourceUrlsFound.add(urlWithoutHashtag);
+        }
+      }
+    } else if (['modResourceView', 'pluginfile'].includes(type)) {
+      message<string>('status-log', `Processing ${url}`);
+      const partialMoodleFile: PartialMoodleFile = {
+        resourceName: name,
+        sourceUrl: url,
+        filenamePrefix: currentPath
+      };
+
+      moodleFiles.push(partialMoodleFile);
+    } else {
+      throw new Error(`Unknown resource type '${type}'!`);
+    }
   }
+
+  return moodleFiles;
 }
 
 export async function downloadMoodleFiles(partialMoodleFiles: PartialMoodleFile[]): Promise<MoodleFile[]> {
@@ -226,7 +238,7 @@ export async function generateZipFile(moodleFiles: MoodleFile[]): Promise<void> 
 }
 
 export function init(): void {
-  processedResourceUrls.clear();
+  resourceUrlsFound.clear();
   message('download-progress', {
     current: 0,
     total: 1
