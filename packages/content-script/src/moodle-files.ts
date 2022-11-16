@@ -137,6 +137,11 @@ export async function getMoodleFiles(initialResource: Resource): Promise<Partial
         if (!targetResource || resourceUrlsFound.has(urlWithoutHashtag)) {
           continue;
         }
+        
+        // Skip next and previous resorce links if in a folder view
+        else if (type === 'modFolderView' && ['prev-activity-link', 'next-activity-link'].includes(url.id)) {
+          continue;
+        }
 
         if (targetResource.type !== 'courseView') {
           let targetPath = currentPath;
