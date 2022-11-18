@@ -138,10 +138,9 @@ export async function getMoodleFiles(initialResource: Resource): Promise<Partial
         // Skip urls that are not valid resources or have already been processed
         if (!targetResource || resourceUrlsFound.has(urlWithoutHashtag)) {
           continue;
-        }
-        
-        // Skip non-file links if in a folder view to prevent jumping into another folder
-        else if (type === 'modFolderView' && targetResource.type === 'modFolderView') {
+        } else if (type === 'modFolderView' && targetResource.type === 'modFolderView') {
+
+          // Skip non-file links if in a folder view to prevent jumping into another folder
           continue;
         }
 
