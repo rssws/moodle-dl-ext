@@ -138,8 +138,8 @@ export async function getMoodleFiles(initialResource: Resource): Promise<Partial
           continue;
         }
         
-        // Skip next and previous resorce links if in a folder view
-        else if (type === 'modFolderView' && ['prev-activity-link', 'next-activity-link'].includes(url.id)) {
+        // Skip non-file links if in a folder view to prevent jumping into another folder
+        else if (type === 'modFolderView' && targetResource.type === 'modFolderView') {
           continue;
         }
 
