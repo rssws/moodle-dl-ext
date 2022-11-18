@@ -123,7 +123,8 @@ export async function getMoodleFiles(initialResource: Resource): Promise<Partial
       const main = page?.querySelector('[role="main"]');
 
       // Get urls from the elememt with role 'main' first if exists, otherwise with id 'page', to narrow down the list of urls
-      const urls = main?.getElementsByTagName('a') ?? page?.getElementsByTagName('a') ?? document.getElementsByTagName('a');
+      const urls =
+        main?.getElementsByTagName('a') ?? page?.getElementsByTagName('a') ?? document.getElementsByTagName('a');
 
       if (type === 'courseResources') {
         const title = document.getElementsByTagName('title')[0].innerText;
@@ -139,7 +140,6 @@ export async function getMoodleFiles(initialResource: Resource): Promise<Partial
         if (!targetResource || resourceUrlsFound.has(urlWithoutHashtag)) {
           continue;
         } else if (type === 'modFolderView' && targetResource.type === 'modFolderView') {
-
           // Skip non-file links if in a folder view to prevent jumping into another folder
           continue;
         }
