@@ -1,7 +1,7 @@
 {
   "name": "moodle-dl-ext",
   "version": "0.2.1",
-  "packageManager": "yarn@3.2.4",
+  "packageManager": "yarn@3.3.0",
   "description": "Moodle downloader extension for Chrome",
   "private": true,
   "repository": "git+https://github.com/rssws/moodle-dl-ext.git",
