@@ -120,8 +120,10 @@ export async function getMoodleFiles(initialResource: Resource): Promise<Partial
       const domParser = new DOMParser();
       const document = domParser.parseFromString(await response.text(), 'text/html');
       const page = document.getElementById('page');
-      // Get urls from the elememt with id 'page' first to narrow down the list of urls
-      const urls = page?.getElementsByTagName('a') ?? document.getElementsByTagName('a');
+      const main = page?.querySelector('[role="main"]');
+
+      // Get urls from the elememt with role 'main' first if exists, otherwise with id 'page', to narrow down the list of urls
+      const urls = main?.getElementsByTagName('a') ?? page?.getElementsByTagName('a') ?? document.getElementsByTagName('a');
 
       if (type === 'courseResources') {
         const title = document.getElementsByTagName('title')[0].innerText;
