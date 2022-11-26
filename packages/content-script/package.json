@@ -1,6 +1,6 @@
 {
   "name": "@moodle-dl-ext/content-script",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "",
   "scripts": {
     "pre-build": "rm -rf build dist && mkdir -p build dist",
