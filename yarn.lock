@@ -2298,7 +2298,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@moodle-dl-ext/content-script@workspace:packages/content-script"
   dependencies:
-    "@types/chrome": ^0.0.216
+    "@types/chrome": ^0.0.217
     "@types/webpack": ^5.28.0
     "@webpack-cli/generators": ^3.0.0
     jszip: ^3.10.1
@@ -2321,7 +2321,7 @@ __metadata:
     "@testing-library/jest-dom": ^5.16.5
     "@testing-library/react": ^14.0.0
     "@testing-library/user-event": ^14.0.0
-    "@types/chrome": ^0.0.216
+    "@types/chrome": ^0.0.217
     "@types/jest": ^29.0.0
     "@types/node": ^18.0.0
     "@types/react": ^18.0.17
@@ -3281,13 +3281,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/chrome@npm:^0.0.216":
-  version: 0.0.216
-  resolution: "@types/chrome@npm:0.0.216"
+"@types/chrome@npm:^0.0.217":
+  version: 0.0.217
+  resolution: "@types/chrome@npm:0.0.217"
   dependencies:
     "@types/filesystem": "*"
     "@types/har-format": "*"
-  checksum: a10020f461e042bc5c04c915833854c1b8897833c6d84e076597fe522645ec441cd20f92fb370427ced4941f2e82fa789465f9ccef11f0b7680cc5a41886ef6d
+  checksum: a450d3e72647801db6ff38c7662d7a6dec9ac2758315668403159d593674826596bd18c593f55f771c37ae954de9a4b7dabc75dc52cab699c416d0a4b4ad6bb7
   languageName: node
   linkType: hard
 
