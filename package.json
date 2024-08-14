@@ -24,7 +24,7 @@
   ],
   "devDependencies": {
     "eslint": "^8.22.0",
-    "eslint-plugin-jsdoc": "^48.0.0",
+    "eslint-plugin-jsdoc": "^50.0.0",
     "eslint-plugin-no-null": "^1.0.2",
     "prettier": "^2.7.1",
     "turbo": "^1.4.3"
