@@ -10490,7 +10490,7 @@ __metadata:
     eslint: ^8.22.0
     eslint-plugin-jsdoc: ^48.0.0
     eslint-plugin-no-null: ^1.0.2
-    prettier: ^2.7.1
+    prettier: ^3.0.0
     turbo: ^1.4.3
   languageName: unknown
   linkType: soft
@@ -12267,12 +12267,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"prettier@npm:^2.7.1":
-  version: 2.8.4
-  resolution: "prettier@npm:2.8.4"
+"prettier@npm:^3.0.0":
+  version: 3.9.6
+  resolution: "prettier@npm:3.9.6"
   bin:
-    prettier: bin-prettier.js
-  checksum: c173064bf3df57b6d93d19aa98753b9b9dd7657212e33b41ada8e2e9f9884066bb9ca0b4005b89b3ab137efffdf8fbe0b462785aba20364798ff4303aadda57e
+    prettier: bin/prettier.cjs
+  checksum: 3fb6a3b6462b05afb825697a3fdcdd9bd1480c11d10d655b7ddbcaf2560beb695caffbe155b5020466005aa06bff74a61ba9c16e602bff849331b62f5db26cdf
   languageName: node
   linkType: hard
 
