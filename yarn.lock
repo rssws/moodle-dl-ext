@@ -2329,7 +2329,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@moodle-dl-ext/content-script@workspace:packages/content-script"
   dependencies:
-    "@types/chrome": ^0.0.263
+    "@types/chrome": ^0.3.0
     "@types/webpack": ^5.28.0
     "@webpack-cli/generators": ^3.0.0
     jszip: ^3.10.1
@@ -2352,7 +2352,7 @@ __metadata:
     "@testing-library/jest-dom": ^6.0.0
     "@testing-library/react": ^14.0.0
     "@testing-library/user-event": ^14.0.0
-    "@types/chrome": ^0.0.263
+    "@types/chrome": ^0.3.0
     "@types/jest": ^29.0.0
     "@types/node": ^20.0.0
     "@types/react": ^18.0.17
@@ -3325,13 +3325,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/chrome@npm:^0.0.263":
-  version: 0.0.263
-  resolution: "@types/chrome@npm:0.0.263"
+"@types/chrome@npm:^0.3.0":
+  version: 0.3.7
+  resolution: "@types/chrome@npm:0.3.7"
   dependencies:
-    "@types/filesystem": "*"
     "@types/har-format": "*"
-  checksum: 2f58d719aae104f987c939cf2c6e5a9d893355e199f70dbab61f17335a9617b60c34b35a87f5f1389314c43784320305289633b9aecbf4cee077dbea2bc4b9bd
+  checksum: 37adc49f1396041220c72239086d607a679d00eba2cb7eabf8cb3251f5518f7fc82f724468630704eea6a1c7a49a1c5ef2645d6ad408c58731dfead38433c0b2
   languageName: node
   linkType: hard
 
@@ -3422,22 +3421,6 @@ __metadata:
     "@types/qs": "*"
     "@types/serve-static": "*"
   checksum: 0196dacc275ac3ce89d7364885cb08e7fb61f53ca101f65886dbf1daf9b7eb05c0943e2e4bbd01b0cc5e50f37e0eea7e4cbe97d0304094411ac73e1b7998f4da
-  languageName: node
-  linkType: hard
-
-"@types/filesystem@npm:*":
-  version: 0.0.32
-  resolution: "@types/filesystem@npm:0.0.32"
-  dependencies:
-    "@types/filewriter": "*"
-  checksum: 4b9079d200a3b241722b90e1c5806c4b32c4dac87d42a1c7ef76a2c0dafdbe7d5f1a379b873ad5de73622b44de6599e1522908f67b938d54e785bd1c36e302a0
-  languageName: node
-  linkType: hard
-
-"@types/filewriter@npm:*":
-  version: 0.0.29
-  resolution: "@types/filewriter@npm:0.0.29"
-  checksum: 0c58aa875c2c245be7dbc42b20212f3203e13d11ec013a4a5cd0febf0e8b87214be5882c05ff9d7bdf0398f145a4fdbc24b7e6cf7b094e134a3b4c7a0598502f
   languageName: node
   linkType: hard
 
